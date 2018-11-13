@@ -1,9 +1,6 @@
 package net.rokyinfo.rn.baidumap;
 
 
-import android.content.Context;
-
-import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.MapView;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;

@@ -7,15 +7,8 @@
  */
 
 import React, {Component} from 'react';
-import {requireNativeComponent, Platform, StyleSheet, Text, View} from 'react-native';
-/**
- * Composes `View`.
- *
- * - src: string
- * - borderRadius: number
- * - resizeMode: 'cover' | 'contain' | 'stretch'
- */
-module.exports = requireNativeComponent("RCTBaiduMapView");
+import {Platform, StyleSheet, Text, View} from 'react-native';
+import MapView from './MapView';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -29,7 +22,7 @@ export default class App extends Component<Props> {
   render() {
     return (
       <View style={styles.container}>
-        <RCTBaiduMapView style={{width: 200, height: 200}} />
+        <MapView style={{width: 200, height: 200}} />
       </View>
     );
   }

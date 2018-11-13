@@ -97,6 +97,12 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
+    sourceSets {
+        main {
+            jniLibs.srcDir 'libs'
+        }
+    }
+    
     defaultConfig {
         applicationId "net.rokyinfo.rn.baidumap"
         minSdkVersion rootProject.ext.minSdkVersion
