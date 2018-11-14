@@ -12,11 +12,8 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
  */
 abstract public class BaseModule extends ReactContextBaseJavaModule {
 
-    protected ReactApplicationContext context;
-
     public BaseModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        context = reactContext;
     }
 
     /**
@@ -24,7 +21,7 @@ abstract public class BaseModule extends ReactContextBaseJavaModule {
      * @param params
      */
     protected void sendEvent(String eventName, @Nullable WritableMap params) {
-        context
+        getReactApplicationContext()
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(eventName, params);
     }

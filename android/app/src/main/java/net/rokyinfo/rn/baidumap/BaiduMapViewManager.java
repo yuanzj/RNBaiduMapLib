@@ -46,9 +46,9 @@ import java.util.List;
 
 public class BaiduMapViewManager extends SimpleViewManager<MapView> {
 
-    private static final String REACT_CLASS = "RCTBaiduMapView";
+    private static final String TAG = BaiduMapViewManager.class.getSimpleName();
 
-    private MapView mMapView;
+    private static final String REACT_CLASS = "RCTBaiduMapView";
 
     // 普通图标缓存
     private HashMap<String, Marker> mMarkerMap = new HashMap<>();
@@ -64,8 +64,6 @@ public class BaiduMapViewManager extends SimpleViewManager<MapView> {
 
     // 定位相关
     private LocationClient mLocClient;
-
-    private MyLocationListenner myListener = new MyLocationListenner();
     // 是否首次定位
     private boolean isFirstLoc = true;
 
@@ -99,18 +97,42 @@ public class BaiduMapViewManager extends SimpleViewManager<MapView> {
         mapView.getMap().setMyLocationEnabled(myLocationEnabled);
         if (myLocationEnabled) {
             // 定位初始化
-            mMapView = mapView;
+            final MapView mapView4Location = mapView;
             mLocClient = new LocationClient(mapView.getContext().getApplicationContext());
-            mLocClient.registerLocationListener(myListener);
-            LocationClientOption option = new LocationClientOption();
-            option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);
-            option.setCoorType("bd09ll");
-            option.setIsNeedAddress(true);
-            option.setIsNeedAltitude(true);
-            option.setIsNeedLocationDescribe(true);
-            option.setOpenGps(true);
+            mLocClient.registerLocationListener(new BDAbstractLocationListener(){
 
+                @Override
+                public void onReceiveLocation(BDLocation location) {
+                    // map view 销毁后不在处理新接收的位置
+                    if (location == null) {
+                        return;
+                    }
+                    if ("4.9E-324".equals(String.valueOf(location.getLatitude()))) {
+                        Log.d(TAG, "定位失败，请开启定位权限");
+                        return;
+                    }
+                    MyLocationData locData = new MyLocationData.Builder()
+                            .accuracy(location.getRadius())
+                            // 此处设置开发者获取到的方向信息，顺时针0-360
+                            .direction(0).latitude(location.getLatitude())
+                            .longitude(location.getLongitude()).build();
+                    mapView4Location.getMap().setMyLocationData(locData);
+                    if (isFirstLoc) {
+                        isFirstLoc = false;
+                        LatLng ll = new LatLng(location.getLatitude(),
+                                location.getLongitude());
+                        MapStatus.Builder builder = new MapStatus.Builder();
+                        builder.target(ll).zoom(18.0f);
+                        mapView4Location.getMap().animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
+                    }
+                }
+            });
+            LocationClientOption option = new LocationClientOption();
+            option.setOpenGps(true); // 打开gps
+            option.setCoorType("bd09ll"); // 设置坐标类型
+            option.setScanSpan(1000);
             mLocClient.setLocOption(option);
+
             mLocClient.start();
         } else {
             if (mLocClient != null) {
@@ -356,7 +378,7 @@ public class BaiduMapViewManager extends SimpleViewManager<MapView> {
         int bucket = getBucket(clusterSize);
         BitmapDescriptor descriptor = mIcons.get(bucket);
         if (descriptor == null) {
-            mColoredCircleBackground.getPaint().setColor(Color.argb(204, 0xE6, 0x4E, 0x42));
+            mColoredCircleBackground.getPaint().setColor(Color.argb(0xFF, 0xE6, 0x4E, 0x42));
             descriptor = BitmapDescriptorFactory.fromBitmap(mIconGenerator.makeIcon(getClusterText(bucket)));
             mIcons.put(bucket, descriptor);
         }
@@ -407,34 +429,5 @@ public class BaiduMapViewManager extends SimpleViewManager<MapView> {
         }
         return BUCKETS[BUCKETS.length - 1];
     }
-
-
-    public class MyLocationListenner extends BDAbstractLocationListener {
-
-        @Override
-        public void onReceiveLocation(BDLocation location) {
-            // map view 销毁后不在处理新接收的位置
-
-            if (location == null || mMapView == null) {
-                return;
-            }
-            MyLocationData locData = new MyLocationData.Builder()
-                    .accuracy(location.getRadius())
-                    // 此处设置开发者获取到的方向信息，顺时针0-360
-                    .direction(0).latitude(location.getLatitude())
-                    .longitude(location.getLongitude()).build();
-            mMapView.getMap().setMyLocationData(locData);
-            if (isFirstLoc) {
-                isFirstLoc = false;
-                LatLng ll = new LatLng(location.getLatitude(),
-                        location.getLongitude());
-                MapStatus.Builder builder = new MapStatus.Builder();
-                builder.target(ll).zoom(18.0f);
-                mMapView.getMap().animateMapStatus(MapStatusUpdateFactory.newMapStatus(builder.build()));
-            }
-        }
-
-    }
-
 
 }

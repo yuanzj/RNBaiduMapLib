@@ -37,7 +37,6 @@ public class GeolocationModule extends BaseModule
 
     public GeolocationModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        context = reactContext;
     }
 
     public String getName() {
@@ -52,7 +51,7 @@ public class GeolocationModule extends BaseModule
         option.setIsNeedAltitude(true);
         option.setIsNeedLocationDescribe(true);
         option.setOpenGps(true);
-        locationClient = new LocationClient(context.getApplicationContext());
+        locationClient = new LocationClient(getReactApplicationContext().getApplicationContext());
         locationClient.setLocOption(option);
         Log.i("locationClient", "locationClient");
         locationClient.registerLocationListener(this);

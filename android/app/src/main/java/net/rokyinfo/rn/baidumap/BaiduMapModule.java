@@ -11,7 +11,6 @@ public class BaiduMapModule extends BaseModule {
 
     public BaiduMapModule(ReactApplicationContext reactContext) {
         super(reactContext);
-        context = reactContext;
     }
 
     public String getName() {

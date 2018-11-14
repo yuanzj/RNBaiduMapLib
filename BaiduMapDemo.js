@@ -37,20 +37,15 @@ export default class BaiduMapDemo extends Component {
         longitude: 113.981718,
         latitude: 22.542449
       },
-      myLocationEnabled: false,
-      myLocationData: {
-        longitude: 120.981718,
-        latitude: 22.542449,
-        isFirstLoc: true
-      },
+      myLocationEnabled: true,
       trafficEnabled: false,
       baiduHeatMapEnabled: false,
       markers: [{
-        longitude: 113.981718,
+        longitude: 113.989718,
         latitude: 22.542449,
         title: "Window of the world"
       },{
-        longitude: 113.995516,
+        longitude: 113.998516,
         latitude: 22.537642,
         title: ""
       }],
