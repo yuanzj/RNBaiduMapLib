@@ -7,6 +7,7 @@ import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.utils.CoordinateConverter;
 import com.facebook.react.bridge.ReadableMap;
 
 /**
@@ -51,9 +52,28 @@ public class MarkerUtil {
     }
 
     public static LatLng getLatLngFromOption(ReadableMap option) {
+
         double latitude = option.getDouble("latitude");
         double longitude = option.getDouble("longitude");
-        return new LatLng(latitude, longitude);
 
+        if (option.getString("coordType").equals("wgs84")) {
+            // 将GPS设备采集的原始GPS坐标转换成百度坐标
+            CoordinateConverter converter = new CoordinateConverter();
+            converter.from(CoordinateConverter.CoordType.GPS);
+
+            // sourceLatLng待转换坐标
+            converter.coord(new LatLng(latitude, longitude));
+            return converter.convert();
+        } else if (option.getString("coordType").equals("gcj02")) {
+            // 国测局GPS坐标转换成百度坐标
+            CoordinateConverter converter = new CoordinateConverter();
+            converter.from(CoordinateConverter.CoordType.COMMON);
+
+            // sourceLatLng待转换坐标
+            converter.coord(new LatLng(latitude, longitude));
+            return converter.convert();
+        } else {
+            return new LatLng(latitude, longitude);
+        }
     }
 }
